@@ -1,0 +1,275 @@
+/* responsive.css - 반응형 스타일 */
+
+/* ===== 모바일 (max-width: 768px) ===== */
+@media (max-width: 768px) {
+    /* 사이드바 숨기기 */
+    [data-testid="stSidebar"] {
+        display: none !important;
+    }
+
+    /* 메인 컨텐츠 패딩 조정 */
+    .main .block-container {
+        padding: 1rem !important;
+        padding-bottom: 80px !important;
+        max-width: 100% !important;
+    }
+
+    /* 제목 크기 조정 */
+    h1 {
+        font-size: 1.5rem !important;
+    }
+
+    h2 {
+        font-size: 1.25rem !important;
+    }
+
+    h3 {
+        font-size: 1.1rem !important;
+    }
+
+    /* 컬럼 스택 */
+    .row-widget.stHorizontal {
+        flex-direction: column !important;
+    }
+
+    .row-widget.stHorizontal > div {
+        width: 100% !important;
+        margin-bottom: 0.5rem;
+    }
+
+    /* 테이블 스크롤 */
+    .stDataFrame {
+        overflow-x: auto !important;
+        font-size: 11px !important;
+    }
+
+    .stDataFrame table {
+        min-width: 600px;
+    }
+
+    /* 버튼 전체 너비 */
+    .stButton > button {
+        width: 100% !important;
+        min-height: 44px !important;
+    }
+
+    /* 입력 필드 터치 최적화 */
+    .stTextInput input,
+    .stNumberInput input,
+    .stTextArea textarea {
+        font-size: 16px !important;  /* iOS 줌 방지 */
+        min-height: 44px;
+    }
+
+    .stSelectbox > div > div {
+        min-height: 44px;
+    }
+
+    /* 탭 스크롤 */
+    .stTabs [data-baseweb="tab-list"] {
+        overflow-x: auto !important;
+        flex-wrap: nowrap !important;
+    }
+
+    .stTabs [data-baseweb="tab"] {
+        flex-shrink: 0;
+    }
+
+    /* 메트릭 카드 */
+    [data-testid="stMetricValue"] {
+        font-size: 1.5rem !important;
+    }
+
+    [data-testid="stMetricLabel"] {
+        font-size: 0.75rem !important;
+    }
+
+    /* 차트 높이 조정 */
+    .js-plotly-plot {
+        height: 250px !important;
+    }
+
+    /* 폼 여백 */
+    .stForm {
+        padding: 1rem !important;
+    }
+
+    /* 하단 네비게이션 */
+    .mobile-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        background: #ffffff;
+        border-top: 1px solid #e0e0e0;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        z-index: 999;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    }
+
+    .mobile-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 12px;
+        cursor: pointer;
+        color: #666;
+        text-decoration: none;
+        font-size: 10px;
+        transition: color 0.2s;
+    }
+
+    .mobile-nav-item:hover,
+    .mobile-nav-item.active {
+        color: #FF4B4B;
+    }
+
+    .mobile-nav-item .icon {
+        font-size: 20px;
+        margin-bottom: 2px;
+    }
+
+    /* Expander 터치 영역 */
+    .streamlit-expanderHeader {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+    }
+
+    /* 슬라이더 터치 영역 */
+    .stSlider > div > div > div {
+        height: 32px !important;
+    }
+}
+
+/* ===== 태블릿 (769px - 1024px) ===== */
+@media (min-width: 769px) and (max-width: 1024px) {
+    [data-testid="stSidebar"] {
+        width: 220px !important;
+    }
+
+    .main .block-container {
+        padding: 1.5rem 2rem !important;
+        max-width: 100% !important;
+    }
+
+    /* 2열 그리드 */
+    .row-widget.stHorizontal > div {
+        flex: 1 1 45% !important;
+    }
+
+    /* 차트 크기 */
+    .js-plotly-plot {
+        height: 300px !important;
+    }
+}
+
+/* ===== 데스크톱 (1025px+) ===== */
+@media (min-width: 1025px) {
+    /* 하단 네비게이션 숨기기 */
+    .mobile-nav {
+        display: none !important;
+    }
+
+    .main .block-container {
+        max-width: 1200px !important;
+        padding: 2rem 3rem !important;
+    }
+
+    /* 사이드바 고정 너비 */
+    [data-testid="stSidebar"] {
+        width: 280px !important;
+    }
+}
+
+/* ===== 다크 모드 반응형 ===== */
+@media (prefers-color-scheme: dark) {
+    .mobile-nav {
+        background: #0E1117;
+        border-color: #262730;
+    }
+
+    .mobile-nav-item {
+        color: #FAFAFA;
+    }
+
+    .mobile-nav-item:hover,
+    .mobile-nav-item.active {
+        color: #FF4B4B;
+    }
+}
+
+/* ===== 인쇄 스타일 ===== */
+@media print {
+    [data-testid="stSidebar"],
+    .mobile-nav,
+    .stButton,
+    .stDownloadButton {
+        display: none !important;
+    }
+
+    .main .block-container {
+        padding: 0 !important;
+        max-width: 100% !important;
+    }
+
+    .stDataFrame {
+        font-size: 10px !important;
+    }
+
+    h1, h2, h3 {
+        page-break-after: avoid;
+    }
+
+    table {
+        page-break-inside: avoid;
+    }
+}
+
+/* ===== 터치 디바이스 최적화 ===== */
+@media (hover: none) and (pointer: coarse) {
+    /* 호버 효과 비활성화 */
+    .stButton > button:hover {
+        transform: none;
+    }
+
+    /* 클릭 영역 확대 */
+    .stCheckbox label,
+    .stRadio label {
+        padding: 8px 0;
+    }
+
+    /* 스크롤바 숨기기 (터치 스크롤 사용) */
+    ::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* 텍스트 선택 비활성화 (버튼 등) */
+    button, a {
+        -webkit-user-select: none;
+        user-select: none;
+    }
+}
+
+/* ===== 접근성 ===== */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* 고대비 모드 */
+@media (prefers-contrast: high) {
+    .card {
+        border-width: 2px;
+    }
+
+    .badge {
+        border: 1px solid currentColor;
+    }
+}
