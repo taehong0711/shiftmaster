@@ -201,7 +201,10 @@
     "user_role": "사용자 권한",
     "shift_settings": "시프트 코드 설정",
     "shift_codes_info": "이 지점에서 사용할 시프트 코드를 설정합니다",
-    "shift_codes_help": "쉼표로 구분하여 코드 입력 (예: E1, E2, G1)"
+    "shift_codes_help": "쉼표로 구분하여 코드 입력 (예: E1, E2, G1)",
+    "required_shifts": "필수 배치 시프트",
+    "required_shifts_info": "매일 최소 1명 배치가 필요한 시프트를 선택하세요",
+    "required_shifts_help": "선택한 시프트는 매일 1명 이상 배치됩니다"
   },
   "swap": {
     "title": "시프트 교환",

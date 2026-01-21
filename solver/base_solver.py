@@ -55,6 +55,7 @@ class SolverInput:
     ng_shifts: Dict[str, Dict[int, List[str]]] = field(default_factory=dict)  # {staff: {day: [shifts]}}
     prev_history: Dict[str, List[str]] = field(default_factory=dict)  # {staff: [d-3, d-2, d-1]}
     fixed_cells: Dict[str, Dict[int, str]] = field(default_factory=dict)  # Stage2용
+    required_shifts: List[str] = field(default_factory=list)  # 매일 최소 1명 필수 시프트
 
 
 @dataclass

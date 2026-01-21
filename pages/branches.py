@@ -218,6 +218,7 @@ def render_branch_shift_settings(branch):
     shift_codes = BranchService.get_branch_shift_codes(branch.id)
     current_day_shifts = shift_codes.get("day_shifts", DEFAULT_DAY_SHIFTS)
     current_night_shifts = shift_codes.get("night_shifts", DEFAULT_NIGHT_SHIFTS)
+    current_required_shifts = shift_codes.get("required_shifts", [])
 
     st.caption(t("branches.shift_codes_info"))
 
@@ -239,13 +240,24 @@ def render_branch_shift_settings(branch):
             help=t("branches.shift_codes_help")
         )
 
+    # 필수 배치 시프트 (매일 최소 1명 필요)
+    st.caption(t("branches.required_shifts_info"))
+    all_shifts = [s.strip() for s in day_shifts_str.split(",") if s.strip()]
+    required_shifts = st.multiselect(
+        t("branches.required_shifts"),
+        options=all_shifts,
+        default=[s for s in current_required_shifts if s in all_shifts],
+        key=f"required_shifts_{branch.id}",
+        help=t("branches.required_shifts_help")
+    )
+
     if st.button(t("common.save"), key=f"save_shifts_{branch.id}"):
         # 문자열을 리스트로 변환 (쉼표로 구분, 공백 제거)
         day_shifts = [s.strip() for s in day_shifts_str.split(",") if s.strip()]
         night_shifts = [s.strip() for s in night_shifts_str.split(",") if s.strip()]
 
         if day_shifts and night_shifts:
-            success = BranchService.update_branch_shift_codes(branch.id, day_shifts, night_shifts)
+            success = BranchService.update_branch_shift_codes(branch.id, day_shifts, night_shifts, required_shifts)
             if success:
                 # 현재 지점이면 세션도 업데이트
                 current_branch_id = get_current_branch_id()

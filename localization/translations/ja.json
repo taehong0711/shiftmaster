@@ -201,7 +201,10 @@
     "user_role": "ユーザー権限",
     "shift_settings": "シフトコード設定",
     "shift_codes_info": "この支店で使用するシフトコードを設定します",
-    "shift_codes_help": "カンマ区切りでコードを入力 (例: E1, E2, G1)"
+    "shift_codes_help": "カンマ区切りでコードを入力 (例: E1, E2, G1)",
+    "required_shifts": "必須配置シフト",
+    "required_shifts_info": "毎日最低1名の配置が必要なシフトを選択してください",
+    "required_shifts_help": "選択したシフトは毎日1名以上配置されます"
   },
   "swap": {
     "title": "シフト交換",

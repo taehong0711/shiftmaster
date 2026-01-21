@@ -299,6 +299,7 @@ def prepare_solver_input(branch_id: str) -> SolverInput:
     shift_codes = BranchService.get_branch_shift_codes(branch_id)
     day_shifts = shift_codes.get("day_shifts", DEFAULT_DAY_SHIFTS)
     night_shifts = shift_codes.get("night_shifts", DEFAULT_NIGHT_SHIFTS)
+    required_shifts = shift_codes.get("required_shifts", [])
 
     return SolverInput(
         year=year,
@@ -311,7 +312,8 @@ def prepare_solver_input(branch_id: str) -> SolverInput:
         requests=get_session("requests", {}),
         ng_shifts=get_session("ng_shifts", {}),
         prev_history=get_session("prev_history", {}),
-        fixed_cells=get_session("edited_cells", {})
+        fixed_cells=get_session("edited_cells", {}),
+        required_shifts=required_shifts
     )
 
 

@@ -279,17 +279,20 @@ class BranchService:
         if branch and branch.settings:
             day_shifts = branch.settings.get("day_shifts", DEFAULT_DAY_SHIFTS.copy())
             night_shifts = branch.settings.get("night_shifts", DEFAULT_NIGHT_SHIFTS.copy())
+            required_shifts = branch.settings.get("required_shifts", [])
             return {
                 "day_shifts": day_shifts,
-                "night_shifts": night_shifts
+                "night_shifts": night_shifts,
+                "required_shifts": required_shifts
             }
         return {
             "day_shifts": DEFAULT_DAY_SHIFTS.copy(),
-            "night_shifts": DEFAULT_NIGHT_SHIFTS.copy()
+            "night_shifts": DEFAULT_NIGHT_SHIFTS.copy(),
+            "required_shifts": []
         }
 
     @staticmethod
-    def update_branch_shift_codes(branch_id: str, day_shifts: List[str], night_shifts: List[str]) -> bool:
+    def update_branch_shift_codes(branch_id: str, day_shifts: List[str], night_shifts: List[str], required_shifts: List[str] = None) -> bool:
         """지점별 시프트 코드 업데이트"""
         branch = BranchService.get_branch_by_id(branch_id)
         if not branch:
@@ -299,5 +302,7 @@ class BranchService:
         settings = branch.settings or {}
         settings["day_shifts"] = day_shifts
         settings["night_shifts"] = night_shifts
+        if required_shifts is not None:
+            settings["required_shifts"] = required_shifts
 
         return BranchService.update_branch(branch_id, settings=settings)

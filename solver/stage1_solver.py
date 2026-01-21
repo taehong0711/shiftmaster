@@ -22,8 +22,11 @@ class Stage1Solver(BaseSolver):
         """솔버 설정"""
         self.input = solver_input
 
-        # Stage1에서 다루는 시프트: 야간 + L1 + 휴무
-        self.stage1_shifts = solver_input.night_shifts + ["L1", SHIFT_OFF, SHIFT_PUBLIC_OFF]
+        # Stage1에서 다루는 시프트: 야간 + 필수 시프트 + 휴무
+        required = solver_input.required_shifts if solver_input.required_shifts else []
+        self.stage1_shifts = solver_input.night_shifts + required + [SHIFT_OFF, SHIFT_PUBLIC_OFF]
+        # 중복 제거
+        self.stage1_shifts = list(dict.fromkeys(self.stage1_shifts))
 
         # 시프트 변수 생성
         self.shift_vars = self.create_shift_variables(
@@ -40,9 +43,11 @@ class Stage1Solver(BaseSolver):
         )
 
         # 스킬 제약
-        skill_map = {
-            "L1": "L1",
-        }
+        skill_map = {}
+        # 필수 시프트에 대한 스킬 매핑 (시프트 코드와 동일한 스킬 필요)
+        for req_shift in required:
+            skill_map[req_shift] = req_shift
+        # 야간 시프트는 NIGHT 스킬 필요
         for ns in solver_input.night_shifts:
             skill_map[ns] = "NIGHT"
 
@@ -97,8 +102,8 @@ class Stage1Solver(BaseSolver):
             weight=30000
         )
 
-        # L1 일별 배치 (매일 1명)
-        self._add_l1_daily_constraint(solver_input)
+        # 필수 시프트 일별 배치 (매일 1명)
+        self._add_required_shifts_daily_constraint(solver_input, required)
 
         # 야간 시프트 균형
         self._add_night_balance_constraint(solver_input)
@@ -146,25 +151,29 @@ class Stage1Solver(BaseSolver):
                 if consecutive_work >= 5 and off_idx is not None:
                     self.model.Add(self.shift_vars[(s_idx, 1, off_idx)] == 1)
 
-    def _add_l1_daily_constraint(self, solver_input: SolverInput):
-        """매일 L1 1명 배치"""
-        shift_to_idx = {s: i for i, s in enumerate(self.stage1_shifts)}
-        l1_idx = shift_to_idx.get("L1")
-
-        if l1_idx is None:
+    def _add_required_shifts_daily_constraint(self, solver_input: SolverInput, required_shifts: List[str]):
+        """매일 필수 시프트 각각 1명 배치"""
+        if not required_shifts:
             return
 
-        for d in range(1, solver_input.num_days + 1):
-            # 휴관일이 아닌 경우만
-            if d not in solver_input.closed_days:
-                l1_count = sum(
-                    self.shift_vars[(s_idx, d, l1_idx)]
-                    for s_idx in range(len(solver_input.staff_list))
-                )
-                # 정확히 1명 (소프트 제약으로 처리)
-                deviation = self.model.NewIntVar(0, len(solver_input.staff_list), f"l1_dev_d{d}")
-                self.model.AddAbsEquality(deviation, l1_count - 1)
-                self.penalty_vars.append((deviation, 35000))
+        shift_to_idx = {s: i for i, s in enumerate(self.stage1_shifts)}
+
+        for req_shift in required_shifts:
+            req_idx = shift_to_idx.get(req_shift)
+            if req_idx is None:
+                continue
+
+            for d in range(1, solver_input.num_days + 1):
+                # 휴관일이 아닌 경우만
+                if d not in solver_input.closed_days:
+                    req_count = sum(
+                        self.shift_vars[(s_idx, d, req_idx)]
+                        for s_idx in range(len(solver_input.staff_list))
+                    )
+                    # 정확히 1명 (소프트 제약으로 처리)
+                    deviation = self.model.NewIntVar(0, len(solver_input.staff_list), f"{req_shift}_dev_d{d}")
+                    self.model.AddAbsEquality(deviation, req_count - 1)
+                    self.penalty_vars.append((deviation, 35000))
 
     def _add_night_balance_constraint(self, solver_input: SolverInput):
         """야간 시프트 균형 배분"""
@@ -212,10 +221,12 @@ class Stage1Solver(BaseSolver):
                     self.input.num_days,
                     self.stage1_shifts
                 )
+                # 필수 시프트를 day shift로 간주
+                day_shifts_for_summary = self.input.required_shifts if self.input.required_shifts else []
                 result.summary_df = self.build_summary_df(
                     result.df,
                     self.input.num_days,
-                    ["L1"],  # Stage1에서는 L1만 day shift
+                    day_shifts_for_summary,
                     self.input.night_shifts
                 )
                 results.append(result)
@@ -247,10 +258,11 @@ def solve_stage1(solver_input: SolverInput, constraints: List[Constraint] = None
             solver_input.num_days,
             solver.stage1_shifts
         )
+        day_shifts_for_summary = solver_input.required_shifts if solver_input.required_shifts else []
         result.summary_df = solver.build_summary_df(
             result.df,
             solver_input.num_days,
-            ["L1"],
+            day_shifts_for_summary,
             solver_input.night_shifts
         )
 

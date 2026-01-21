@@ -201,7 +201,10 @@
     "user_role": "User Role",
     "shift_settings": "Shift Code Settings",
     "shift_codes_info": "Configure shift codes used by this branch",
-    "shift_codes_help": "Enter codes separated by commas (e.g., E1, E2, G1)"
+    "shift_codes_help": "Enter codes separated by commas (e.g., E1, E2, G1)",
+    "required_shifts": "Required Shifts",
+    "required_shifts_info": "Select shifts that require at least 1 person daily",
+    "required_shifts_help": "Selected shifts will have at least 1 person assigned each day"
   },
   "swap": {
     "title": "Shift Swap",
