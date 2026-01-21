@@ -107,56 +107,61 @@ def inject_mobile_css():
 
 
 def render_mobile_nav():
-    """모바일 하단 네비게이션 렌더링"""
+    """모바일 하단 네비게이션 렌더링 (Streamlit 네이티브 방식)"""
     current_page = get_current_page()
     lang = st.session_state.get("language", "ja")
 
     # 모바일에서 표시할 주요 페이지
     mobile_pages = ["dashboard", "schedule", "staff", "constraints", "settings"]
 
-    nav_items = []
-    for page_key in mobile_pages:
+    # 모바일 네비게이션을 위한 컨테이너
+    st.markdown("""
+    <style>
+    .mobile-bottom-nav {
+        display: none;
+    }
+    @media (max-width: 768px) {
+        .mobile-bottom-nav {
+            display: block;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            padding: 8px 0;
+            z-index: 999;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+        .stHorizontalBlock {
+            gap: 0 !important;
+        }
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # Streamlit 버튼 기반 네비게이션
+    cols = st.columns(len(mobile_pages))
+
+    for idx, page_key in enumerate(mobile_pages):
         if page_key in PAGES:
             page_info = PAGES[page_key]
             name = page_info.get(f"name_{lang}", page_info.get("name_ja", page_key))
             icon = page_info.get("icon", "📄")
-            is_active = "active" if page_key == current_page else ""
+            is_current = page_key == current_page
 
-            nav_items.append(f'''
-                <div class="mobile-nav-item {is_active}" onclick="handleNavClick('{page_key}')">
-                    <span class="icon">{icon}</span>
-                    <span>{name}</span>
-                </div>
-            ''')
-
-    nav_html = f'''
-    <div class="mobile-nav">
-        {''.join(nav_items)}
-    </div>
-
-    <script>
-    function handleNavClick(page) {{
-        // Streamlit에 페이지 변경 요청
-        const form = document.createElement('form');
-        form.method = 'post';
-        form.action = '';
-
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'mobile_nav_page';
-        input.value = page;
-        form.appendChild(input);
-
-        document.body.appendChild(form);
-        form.submit();
-    }}
-    </script>
-    '''
-
-    st.markdown(nav_html, unsafe_allow_html=True)
-
-    # Streamlit 네이티브 방식으로 페이지 변경 처리
-    # (JavaScript 폼 제출이 동작하지 않을 수 있으므로 대안 제공)
+            with cols[idx]:
+                # 현재 페이지면 primary, 아니면 secondary
+                btn_type = "primary" if is_current else "secondary"
+                if st.button(
+                    f"{icon}",
+                    key=f"mobile_nav_{page_key}",
+                    use_container_width=True,
+                    type=btn_type,
+                    help=name
+                ):
+                    set_current_page(page_key)
+                    st.rerun()
 
 
 def render_mobile_header(title: str, show_back: bool = False, on_back=None):
