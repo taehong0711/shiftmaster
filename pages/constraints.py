@@ -107,19 +107,19 @@ def render_constraint_list(branch_id: str, can_edit: bool):
 
     # 전체 탭
     with tabs[0]:
-        render_constraints_table(constraints, can_edit, lang)
+        render_constraints_table(constraints, can_edit, lang, "all")
 
     # 카테고리별 탭
     for i, category in enumerate(categories):
         with tabs[i + 1]:
             filtered = [c for c in constraints if c.category == category]
             if filtered:
-                render_constraints_table(filtered, can_edit, lang)
+                render_constraints_table(filtered, can_edit, lang, category)
             else:
                 st.info(t("common.none"))
 
 
-def render_constraints_table(constraints: list, can_edit: bool, lang: str):
+def render_constraints_table(constraints: list, can_edit: bool, lang: str, key_prefix: str = ""):
     """제약 테이블 렌더링"""
     for constraint in constraints:
         with st.container():
@@ -153,7 +153,7 @@ def render_constraints_table(constraints: list, can_edit: bool, lang: str):
                         max_value=200000,
                         value=constraint.penalty_weight,
                         step=1000,
-                        key=f"weight_{constraint.id}",
+                        key=f"weight_{key_prefix}_{constraint.id}",
                         label_visibility="collapsed"
                     )
                     if new_weight != constraint.penalty_weight:
@@ -167,7 +167,7 @@ def render_constraints_table(constraints: list, can_edit: bool, lang: str):
                     enabled = st.toggle(
                         t("constraints.enabled"),
                         value=constraint.is_enabled,
-                        key=f"toggle_{constraint.id}",
+                        key=f"toggle_{key_prefix}_{constraint.id}",
                         label_visibility="collapsed"
                     )
                     if enabled != constraint.is_enabled:
