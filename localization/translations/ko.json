@@ -161,6 +161,7 @@
     "enabled": "활성화",
     "disabled": "비활성화",
     "toggle": "전환",
+    "current_branch_notice": "현재 지점의 제약조건",
     "categories": {
       "coverage": "인원배치",
       "sequence": "연속근무",
@@ -197,7 +198,10 @@
     "branch_updated": "지점을 업데이트했습니다",
     "branch_deleted": "지점을 삭제했습니다",
     "assign_users": "사용자 할당",
-    "user_role": "사용자 권한"
+    "user_role": "사용자 권한",
+    "shift_settings": "시프트 코드 설정",
+    "shift_codes_info": "이 지점에서 사용할 시프트 코드를 설정합니다",
+    "shift_codes_help": "쉼표로 구분하여 코드 입력 (예: E1, E2, G1)"
   },
   "swap": {
     "title": "시프트 교환",

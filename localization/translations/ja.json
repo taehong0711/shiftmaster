@@ -161,6 +161,7 @@
     "enabled": "有効",
     "disabled": "無効",
     "toggle": "切替",
+    "current_branch_notice": "現在の支店の制約条件",
     "categories": {
       "coverage": "人員配置",
       "sequence": "連続勤務",
@@ -197,7 +198,10 @@
     "branch_updated": "支店を更新しました",
     "branch_deleted": "支店を削除しました",
     "assign_users": "ユーザー割り当て",
-    "user_role": "ユーザー権限"
+    "user_role": "ユーザー権限",
+    "shift_settings": "シフトコード設定",
+    "shift_codes_info": "この支店で使用するシフトコードを設定します",
+    "shift_codes_help": "カンマ区切りでコードを入力 (例: E1, E2, G1)"
   },
   "swap": {
     "title": "シフト交換",

@@ -2,10 +2,11 @@
 """지점 서비스"""
 
 import streamlit as st
-from typing import Optional, List
+from typing import Optional, List, Dict
 from models.branch import Branch, UserBranch
 from core.database import get_db, is_demo_mode, db_insert, db_update, db_delete, db_select
 from core.session import get_demo_data, set_demo_data, add_demo_data, delete_demo_data
+from config.constants import DEFAULT_DAY_SHIFTS, DEFAULT_NIGHT_SHIFTS
 import uuid
 
 
@@ -259,10 +260,44 @@ class BranchService:
         if branches:
             return branches[0]
 
-        # 기본 지점 생성
+        # 기본 지점 생성 (기본 시프트 코드 포함)
         return BranchService.create_branch(
             name="本店",
             code="MAIN",
             timezone="Asia/Tokyo",
-            settings={"is_default": True}
+            settings={
+                "is_default": True,
+                "day_shifts": DEFAULT_DAY_SHIFTS.copy(),
+                "night_shifts": DEFAULT_NIGHT_SHIFTS.copy()
+            }
         )
+
+    @staticmethod
+    def get_branch_shift_codes(branch_id: str) -> Dict[str, List[str]]:
+        """지점별 시프트 코드 조회"""
+        branch = BranchService.get_branch_by_id(branch_id)
+        if branch and branch.settings:
+            day_shifts = branch.settings.get("day_shifts", DEFAULT_DAY_SHIFTS.copy())
+            night_shifts = branch.settings.get("night_shifts", DEFAULT_NIGHT_SHIFTS.copy())
+            return {
+                "day_shifts": day_shifts,
+                "night_shifts": night_shifts
+            }
+        return {
+            "day_shifts": DEFAULT_DAY_SHIFTS.copy(),
+            "night_shifts": DEFAULT_NIGHT_SHIFTS.copy()
+        }
+
+    @staticmethod
+    def update_branch_shift_codes(branch_id: str, day_shifts: List[str], night_shifts: List[str]) -> bool:
+        """지점별 시프트 코드 업데이트"""
+        branch = BranchService.get_branch_by_id(branch_id)
+        if not branch:
+            return False
+
+        # 기존 settings에 시프트 코드 업데이트
+        settings = branch.settings or {}
+        settings["day_shifts"] = day_shifts
+        settings["night_shifts"] = night_shifts
+
+        return BranchService.update_branch(branch_id, settings=settings)

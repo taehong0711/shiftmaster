@@ -3,7 +3,7 @@
 
 import streamlit as st
 from localization import t
-from core.session import get_current_branch_id
+from core.session import get_current_branch_id, get_current_branch_name
 from core.auth import is_editor, is_super
 from services.constraint_service import ConstraintService
 from config.constants import CONSTRAINT_CATEGORIES
@@ -18,6 +18,11 @@ def render():
     if not branch_id:
         st.warning(t("branches.no_branches"))
         return
+
+    # 현재 지점 표시
+    branch_name = get_current_branch_name()
+    if branch_name:
+        st.info(f"{t('constraints.current_branch_notice')}: **{branch_name}**")
 
     can_edit = is_editor()
 

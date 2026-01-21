@@ -3,10 +3,10 @@
 
 import streamlit as st
 from localization import t
-from core.session import get_current_branch_id, set_current_branch
+from core.session import get_current_branch_id, set_current_branch, set_session
 from core.auth import is_super, is_editor, get_current_user
 from services.branch_service import BranchService
-from config.constants import ROLE_SUPER, ROLE_EDITOR, ROLE_VIEWER
+from config.constants import ROLE_SUPER, ROLE_EDITOR, ROLE_VIEWER, DEFAULT_DAY_SHIFTS, DEFAULT_NIGHT_SHIFTS
 
 
 def render():
@@ -169,6 +169,12 @@ def render_edit_branch_form(branch):
             else:
                 st.error(t("errors.delete_failed"))
 
+    # 시프트 코드 설정
+    st.subheader(t("branches.shift_settings"))
+    render_branch_shift_settings(branch)
+
+    st.divider()
+
     # 사용자 할당
     st.subheader(t("branches.assign_users"))
     render_user_assignment(branch)
@@ -204,3 +210,51 @@ def render_user_assignment(branch):
                     st.success(t("common.success"))
                 else:
                     st.error(t("errors.save_failed"))
+
+
+def render_branch_shift_settings(branch):
+    """지점별 시프트 코드 설정"""
+    # 현재 지점의 시프트 코드 가져오기
+    shift_codes = BranchService.get_branch_shift_codes(branch.id)
+    current_day_shifts = shift_codes.get("day_shifts", DEFAULT_DAY_SHIFTS)
+    current_night_shifts = shift_codes.get("night_shifts", DEFAULT_NIGHT_SHIFTS)
+
+    st.caption(t("branches.shift_codes_info"))
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        day_shifts_str = st.text_area(
+            t("settings.day_shifts"),
+            value=", ".join(current_day_shifts),
+            key=f"day_shifts_{branch.id}",
+            help=t("branches.shift_codes_help")
+        )
+
+    with col2:
+        night_shifts_str = st.text_area(
+            t("settings.night_shifts"),
+            value=", ".join(current_night_shifts),
+            key=f"night_shifts_{branch.id}",
+            help=t("branches.shift_codes_help")
+        )
+
+    if st.button(t("common.save"), key=f"save_shifts_{branch.id}"):
+        # 문자열을 리스트로 변환 (쉼표로 구분, 공백 제거)
+        day_shifts = [s.strip() for s in day_shifts_str.split(",") if s.strip()]
+        night_shifts = [s.strip() for s in night_shifts_str.split(",") if s.strip()]
+
+        if day_shifts and night_shifts:
+            success = BranchService.update_branch_shift_codes(branch.id, day_shifts, night_shifts)
+            if success:
+                # 현재 지점이면 세션도 업데이트
+                current_branch_id = get_current_branch_id()
+                if current_branch_id == branch.id:
+                    set_session("shifts_day", day_shifts)
+                    set_session("shifts_night", night_shifts)
+                st.success(t("branches.branch_updated"))
+                st.rerun()
+            else:
+                st.error(t("errors.save_failed"))
+        else:
+            st.error(t("errors.validation"))

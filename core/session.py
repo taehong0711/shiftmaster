@@ -114,6 +114,12 @@ def set_current_branch(branch_id: str, branch_name: str = None):
     # 지점 변경 시 솔버 상태 초기화
     clear_solver_state()
 
+    # 지점별 시프트 코드 로드 (lazy import로 순환 참조 방지)
+    from services.branch_service import BranchService
+    shift_codes = BranchService.get_branch_shift_codes(branch_id)
+    st.session_state.shifts_day = shift_codes.get("day_shifts", DEFAULT_DAY_SHIFTS.copy())
+    st.session_state.shifts_night = shift_codes.get("night_shifts", DEFAULT_NIGHT_SHIFTS.copy())
+
 
 def get_current_branch_name() -> Optional[str]:
     """현재 선택된 지점 이름"""

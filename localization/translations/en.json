@@ -161,6 +161,7 @@
     "enabled": "Enabled",
     "disabled": "Disabled",
     "toggle": "Toggle",
+    "current_branch_notice": "Constraints for current branch",
     "categories": {
       "coverage": "Coverage",
       "sequence": "Sequence",
@@ -197,7 +198,10 @@
     "branch_updated": "Branch updated",
     "branch_deleted": "Branch deleted",
     "assign_users": "Assign Users",
-    "user_role": "User Role"
+    "user_role": "User Role",
+    "shift_settings": "Shift Code Settings",
+    "shift_codes_info": "Configure shift codes used by this branch",
+    "shift_codes_help": "Enter codes separated by commas (e.g., E1, E2, G1)"
   },
   "swap": {
     "title": "Shift Swap",

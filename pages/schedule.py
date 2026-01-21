@@ -14,6 +14,7 @@ from models.staff import get_staff_for_branch, Staff
 from models.constraint import get_enabled_constraints
 from services.shift_service import ShiftService
 from services.constraint_service import ConstraintService
+from services.branch_service import BranchService
 from solver import (
     SolverConfig, SolverInput, StaffInfo,
     solve_stage1_multi, solve_stage2_multi
@@ -288,9 +289,10 @@ def prepare_solver_input(branch_id: str) -> SolverInput:
         for s in staff_list
     ]
 
-    # 시프트 코드
-    day_shifts = get_session("shifts_day", DEFAULT_DAY_SHIFTS)
-    night_shifts = get_session("shifts_night", DEFAULT_NIGHT_SHIFTS)
+    # 지점별 시프트 코드 가져오기
+    shift_codes = BranchService.get_branch_shift_codes(branch_id)
+    day_shifts = shift_codes.get("day_shifts", DEFAULT_DAY_SHIFTS)
+    night_shifts = shift_codes.get("night_shifts", DEFAULT_NIGHT_SHIFTS)
 
     return SolverInput(
         year=year,
