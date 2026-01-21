@@ -83,7 +83,7 @@
     "target_month": "対象月",
     "closed_days": "休館日",
     "previous_history": "前月履歴 (d-3, d-2, d-1)",
-    "stage1": "Stage1: 夜勤・L1配置",
+    "stage1": "Stage1: 夜勤配置",
     "stage2": "Stage2: 日勤配置",
     "generate": "生成",
     "generating": "生成中...",
