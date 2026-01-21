@@ -60,35 +60,40 @@ def render_settings(branch_id: str):
     """설정 영역 렌더링"""
     col1, col2 = st.columns(2)
 
+    today = date.today()
+
     with col1:
-        # 대상 월
-        today = date.today()
-        next_month = date(today.year + (today.month // 12), (today.month % 12) + 1, 1)
+        # 대상 월 - 기본값 설정
+        if "target_month" not in st.session_state:
+            next_month = date(today.year + (today.month // 12), (today.month % 12) + 1, 1)
+            st.session_state.target_month = next_month
+
         target_date = st.date_input(
             t("schedule.target_month"),
-            value=next_month,
             key="target_month"
         )
-        set_session("target_year", target_date.year)
-        set_session("target_month_num", target_date.month)
 
     with col2:
-        # 후보 수
-        k_best = st.slider(t("schedule.k_best"), 1, 8, 3, key="k_best")
-        set_session("k_best", k_best)
+        # 후보 수 - 기본값 설정
+        if "k_best" not in st.session_state:
+            st.session_state.k_best = 3
+
+        st.slider(t("schedule.k_best"), 1, 8, key="k_best")
 
     # 휴관일
-    year = get_session("target_year", today.year)
-    month = get_session("target_month_num", today.month)
+    year = target_date.year
+    month = target_date.month
     num_days = monthrange(year, month)[1]
 
-    closed_days = st.multiselect(
+    # 기본값 설정
+    if "closed_days_select" not in st.session_state:
+        st.session_state.closed_days_select = []
+
+    st.multiselect(
         t("schedule.closed_days"),
         options=list(range(1, num_days + 1)),
-        default=get_session("closed_days", []),
         key="closed_days_select"
     )
-    set_session("closed_days", closed_days)
 
 
 def render_stage1(branch_id: str):
@@ -212,7 +217,7 @@ def run_stage1(branch_id: str):
         # 설정
         config = SolverConfig(
             max_time_seconds=60,
-            k_best=get_session("k_best", 3)
+            k_best=st.session_state.get("k_best", 3)
         )
 
         # 솔버 실행
@@ -249,7 +254,7 @@ def run_stage2(branch_id: str):
         # 설정
         config = SolverConfig(
             max_time_seconds=60,
-            k_best=get_session("k_best", 3)
+            k_best=st.session_state.get("k_best", 3)
         )
 
         # 솔버 실행
@@ -270,9 +275,10 @@ def prepare_solver_input(branch_id: str) -> SolverInput:
         st.error(t("errors.not_found"))
         return None
 
-    # 날짜 정보
-    year = get_session("target_year", date.today().year)
-    month = get_session("target_month_num", date.today().month)
+    # 날짜 정보 (위젯 키에서 직접 가져오기)
+    target_month = st.session_state.get("target_month", date.today())
+    year = target_month.year
+    month = target_month.month
     num_days = monthrange(year, month)[1]
 
     # StaffInfo 변환
@@ -301,7 +307,7 @@ def prepare_solver_input(branch_id: str) -> SolverInput:
         staff_list=staff_info_list,
         day_shifts=day_shifts,
         night_shifts=night_shifts,
-        closed_days=get_session("closed_days", []),
+        closed_days=st.session_state.get("closed_days_select", []),
         requests=get_session("requests", {}),
         ng_shifts=get_session("ng_shifts", {}),
         prev_history=get_session("prev_history", {}),
@@ -317,8 +323,9 @@ def style_shift_df(df: pd.DataFrame) -> pd.DataFrame:
 
 def save_to_db(branch_id: str, df: pd.DataFrame, summary_df: pd.DataFrame):
     """DB에 저장"""
-    year = get_session("target_year")
-    month = get_session("target_month_num")
+    target_month = st.session_state.get("target_month", date.today())
+    year = target_month.year
+    month = target_month.month
 
     summary_data = summary_df.to_dict('records') if summary_df is not None else {}
 
@@ -336,8 +343,9 @@ def export_excel(df: pd.DataFrame):
         df.to_excel(writer, index=False, sheet_name='Shift')
     output.seek(0)
 
-    year = get_session("target_year")
-    month = get_session("target_month_num")
+    target_month = st.session_state.get("target_month", date.today())
+    year = target_month.year
+    month = target_month.month
     filename = f"shift_{year}_{month:02d}.xlsx"
 
     st.download_button(
